@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const connectDB = require('./config/dbconnection');
@@ -21,10 +22,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 // Mes routes 
-app.use('/', homeRoutes);
-app.use('/my-pro-files', homeRoutes);
+app.use('/api/home', homeRoutes);
 app.use('/api/projects', projectsRoutes);
-app.use('/contact', contactRoutes);
+app.use('/api/contact', contactRoutes);
+
+// Servir les fichiers statiques de l'application React
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Toutes les autres requêtes renvoient le fichier index.html de l'application React
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 // Vérifier que le serveur est en marche 
 app.get('/health', (req, res) => {
